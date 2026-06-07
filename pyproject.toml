@@ -24,8 +24,8 @@ api = [
     "uvicorn[standard]>=0.30.0",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.0.0",
 ]
 
