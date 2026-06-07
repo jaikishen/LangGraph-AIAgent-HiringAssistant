@@ -1,6 +1,7 @@
 from __future__ import annotations
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 
 from hiregraph.state import HireGraphState
 from hiregraph.nodes import (
@@ -58,4 +59,6 @@ def build_graph() -> StateGraph:
 
 def compile_graph(checkpointer=None):
     workflow = build_graph()
-    return workflow.compile(checkpointer=checkpointer or MemorySaver())
+    return workflow.compile(
+        checkpointer=checkpointer or MemorySaver(serde=JsonPlusSerializer())
+    )

@@ -71,6 +71,12 @@ class MockLLM:
 
     def invoke(self, prompt: Any) -> _MockResponse:
         text = str(prompt).lower()
+
+        # Detect candidate from resume content in prompt
+        is_mira  = any(k in text for k in ["ui/ux", "css", "figma", "react native", "sketch", "mira"])
+        is_eitan = any(k in text for k in ["eitan", "3 years", "entry-level"])
+        is_priya = any(k in text for k in ["pelican", "8 years", "staff backend", "priya"])
+
         if any(k in text for k in ["draft", "write an email", "compose"]):
             return _MockResponse(content=(
                 "Dear Candidate,\n\n"
@@ -80,12 +86,13 @@ class MockLLM:
                 "Best regards,\nHiring Team"
             ))
         if "educational background" in text:
-            return _MockResponse(content="70")
+            return _MockResponse(content="30" if is_mira else "65" if is_eitan else "70")
         if "experience" in text and "score" in text:
-            return _MockResponse(content="82")
+            return _MockResponse(content="25" if is_mira else "60" if is_eitan else "82")
         if "signal" in text or "github" in text:
-            return _MockResponse(content="80")
-        return _MockResponse(content="75")
+            return _MockResponse(content="20" if is_mira else "55" if is_eitan else "80")
+        # Default — skill scoring
+        return _MockResponse(content="20" if is_mira else "58" if is_eitan else "82")
 
     def with_structured_output(self, schema):
         name = getattr(schema, "__name__", "")
