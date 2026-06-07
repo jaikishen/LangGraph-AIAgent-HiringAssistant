@@ -2,6 +2,7 @@ from hiregraph.state import HireGraphState
 
 
 def ingest(state: HireGraphState) -> dict:
+    """Validate and log input sizes; first node in the linear ingestion chain."""
     resume_len = len(state.get("resume_text") or "")
     jd_len = len(state.get("jd_text") or "")
     print("=== CLASSIFICATION ===")

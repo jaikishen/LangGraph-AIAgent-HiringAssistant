@@ -4,6 +4,7 @@ from hiregraph.prompts import build_experience_prompt
 
 
 def experience_scorer(state: HireGraphState) -> dict:
+    """Score overall years and quality of experience; runs in parallel with education and signal scorers."""
     llm = get_llm()
     response = llm.invoke(build_experience_prompt(state))
     try:

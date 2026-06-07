@@ -12,6 +12,7 @@ class SkillPlan(BaseModel):
 
 
 def plan_required_skills(state: HireGraphState) -> Command:
+    """Extract required skills from the JD and fan out one Send per skill to per_skill_worker."""
     llm = get_llm()
     structured = llm.with_structured_output(SkillPlan)
     plan: SkillPlan = structured.invoke(build_skill_plan_prompt(state))

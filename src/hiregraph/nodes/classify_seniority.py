@@ -7,6 +7,7 @@ from hiregraph.prompts import build_classify_prompt
 
 
 def classify_seniority(state: HireGraphState) -> Command[Literal["plan_required_skills"]]:
+    """Use structured LLM output to classify candidate seniority and role family."""
     llm = get_llm()
     structured = llm.with_structured_output(Classification)
     classification: Classification = structured.invoke(build_classify_prompt(state))

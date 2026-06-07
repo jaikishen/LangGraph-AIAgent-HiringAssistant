@@ -10,6 +10,7 @@ MAX_TOOL_ROUNDS = 5
 
 
 def signal_scorer(state: HireGraphState) -> dict:
+    """Research agent: call Tavily and GitHub tools to score public signals; runs in parallel."""
     llm = get_llm()
     bound_llm = llm.bind_tools(TOOLS)
     tool_map = {t.name: t for t in TOOLS}

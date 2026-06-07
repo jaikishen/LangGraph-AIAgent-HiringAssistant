@@ -5,6 +5,7 @@ from hiregraph.state import HireGraphState
 
 
 def borderline_review(state: HireGraphState) -> Command[Literal["draft_email"]]:
+    """Interrupt for human scorecard review (50-74 score); resumes to draft_email on decision."""
     decision = interrupt({
         "candidate_id": state.get("candidate_id"),
         "final_score": state.get("final_score"),

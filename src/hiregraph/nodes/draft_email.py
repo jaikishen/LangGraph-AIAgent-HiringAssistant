@@ -7,6 +7,7 @@ from hiregraph.prompts import build_draft_prompt
 
 
 def draft_email(state: HireGraphState) -> Command[Literal["critic_loop"]]:
+    """Draft a candidate email tailored to the recommendation and skill scores."""
     llm = get_llm()
     response = llm.invoke(build_draft_prompt(state))
     attempts = (state.get("draft_attempts") or 0) + 1

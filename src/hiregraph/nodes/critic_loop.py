@@ -11,6 +11,7 @@ PASS_THRESHOLD = 70
 
 
 def critic_loop(state: HireGraphState) -> Command[Literal["draft_email", "human_review", "send_email"]]:
+    """Evaluator-optimizer: grade the email draft and loop back to draft_email or escalate to human_review."""
     attempts = state.get("draft_attempts") or 1
     llm = get_llm()
     structured = llm.with_structured_output(CriticFeedback)

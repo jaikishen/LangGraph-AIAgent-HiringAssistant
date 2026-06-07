@@ -6,6 +6,7 @@ import hiregraph.services as svc
 
 
 def update_ats(state: HireGraphState) -> Command[Literal["finalize", "compensate"]]:
+    """Saga step 2: log the hiring decision to the ATS; routes to finalize or compensate on ATSUpdateError."""
     candidate_id = state.get("candidate_id", "unknown")
     recommendation = state.get("recommendation") or "advance"
 

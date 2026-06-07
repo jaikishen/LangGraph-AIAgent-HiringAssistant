@@ -5,6 +5,7 @@ from hiregraph.state import HireGraphState
 
 
 def human_review(state: HireGraphState) -> Command[Literal["send_email", "draft_email"]]:
+    """Interrupt for human email review after critic exhaustion; resumes to send_email or draft_email."""
     decision = interrupt({
         "candidate_id": state.get("candidate_id"),
         "email_draft": state.get("email_draft"),

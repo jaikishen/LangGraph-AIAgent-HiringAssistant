@@ -6,6 +6,7 @@ import hiregraph.services as svc
 
 
 def send_email(state: HireGraphState) -> Command[Literal["update_ats", "compensate"]]:
+    """Saga step 1: send the candidate email; routes to update_ats on success or compensate on EmailSendError."""
     candidate_id = state.get("candidate_id", "unknown")
     recommendation = state.get("recommendation") or "advance"
     draft = state.get("email_draft") or "(no draft)"

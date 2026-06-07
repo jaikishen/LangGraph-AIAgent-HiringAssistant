@@ -5,6 +5,7 @@ from hiregraph.state import HireGraphState
 
 
 def aggregate_scores(state: HireGraphState) -> Command[Literal["advance_path", "reject_path", "borderline_review"]]:
+    """Compute weighted final score and route to advance_path, reject_path, or borderline_review."""
     skill_scores = state.get("skill_scores") or []
     skill_avg = (
         sum(s.score for s in skill_scores) / len(skill_scores)

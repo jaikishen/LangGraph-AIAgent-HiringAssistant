@@ -4,6 +4,7 @@ from hiregraph.prompts import build_skill_score_prompt
 
 
 def per_skill_worker(state: HireGraphState) -> dict:
+    """Score one skill against the resume; called once per skill via Send from plan_required_skills."""
     skill = state.get("skill")
     if skill is None:
         return {"audit_trail": ["per_skill_worker: no skill in payload, skipping"]}

@@ -5,6 +5,7 @@ from hiregraph.state import HireGraphState
 
 
 def compensate(state: HireGraphState) -> Command[Literal["finalize"]]:
+    """Saga rollback: mark sent_status as compensated and route to finalize."""
     candidate_id = state.get("candidate_id", "unknown")
     sent_status = state.get("sent_status") or "failed"
 

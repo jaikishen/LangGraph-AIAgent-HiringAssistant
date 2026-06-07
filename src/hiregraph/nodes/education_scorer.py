@@ -4,6 +4,7 @@ from hiregraph.prompts import build_education_prompt
 
 
 def education_scorer(state: HireGraphState) -> dict:
+    """Score educational background; runs in parallel with experience and signal scorers."""
     llm = get_llm()
     response = llm.invoke(build_education_prompt(state))
     try:
