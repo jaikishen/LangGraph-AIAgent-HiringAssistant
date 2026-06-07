@@ -1,4 +1,32 @@
-from hiregraph.state import HireGraphState
+from __future__ import annotations
+from typing import Literal
+from langgraph.types import Command, Send
+from pydantic import BaseModel
 
-def plan_required_skills(state: HireGraphState) -> dict:
-    return {"audit_trail": ["plan_required_skills: stub"]}
+from hiregraph.state import HireGraphState, Skill
+from hiregraph.llm import get_llm
+from hiregraph.prompts import build_skill_plan_prompt
+
+
+class SkillPlan(BaseModel):
+    skills: list[Skill]
+
+
+def plan_required_skills(state: HireGraphState) -> Command:
+    llm = get_llm()
+    structured = llm.with_structured_output(SkillPlan)
+    plan: SkillPlan = structured.invoke(build_skill_plan_prompt(state))
+    skills = plan.skills or []
+
+    audit = [f"plan: extracted {len(skills)} skills — {[s.name for s in skills]}"]
+
+    if not skills:
+        return Command(
+            update={"required_skills": [], "audit_trail": audit},
+            goto=["experience_scorer", "education_scorer", "signal_scorer"],
+        )
+
+    return Command(
+        update={"required_skills": skills, "audit_trail": audit},
+        goto=[Send("per_skill_worker", {"skill": skill}) for skill in skills],
+    )
