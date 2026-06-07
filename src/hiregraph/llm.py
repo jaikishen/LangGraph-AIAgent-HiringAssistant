@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Any
+﻿from typing import Any
 from dataclasses import dataclass, field
 from hiregraph.config import get_settings
 from hiregraph.state import Classification, CriticFeedback, Skill
@@ -91,7 +90,7 @@ class MockLLM:
             return _MockResponse(content="25" if is_mira else "60" if is_eitan else "82")
         if "signal" in text or "github" in text:
             return _MockResponse(content="20" if is_mira else "55" if is_eitan else "80")
-        # Default — skill scoring
+        # Default â€” skill scoring
         return _MockResponse(content="20" if is_mira else "58" if is_eitan else "82")
 
     def with_structured_output(self, schema):

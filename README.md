@@ -228,8 +228,29 @@ Routing:  ≥ 75  →  advance_path
 
 ## Mock vs real mode
 
-`HIREGRAPH_USE_MOCKS=true` (default) uses `MockLLM` and mock service calls — no API keys needed, fully deterministic, runs offline.
+`HIREGRAPH_USE_MOCKS=true` uses `MockLLM` and mock service calls — no API keys needed, fully deterministic, runs offline.
 
 `HIREGRAPH_USE_MOCKS=false` uses `ChatOpenAI` (gpt-4o-mini), real Tavily web search, and real GitHub profile lookups.
+
+| Service | Mock | Real | Notes |
+|---|---|---|---|
+| LLM scoring | `MockLLM` (keyword-based, deterministic) | `ChatOpenAI` gpt-4o-mini | Mock scores: Priya=82, Eitan=58, Mira=20 per skill |
+| Skill planning | Hardcodes 4 skills (Python, Kafka, PostgreSQL, distributed systems) | GPT extracts from JD | Real mode extracts all skills mentioned in the JD |
+| Web search | Canned `_mock_tavily_search()` results | Tavily API (free tier) | Research agent uses this for signal scoring |
+| GitHub lookup | Hardcoded profiles for 3 test usernames | GitHub REST API with token | Real mode fetches public repo count and bio |
+| Email send | `_mock_send_email()` prints to stdout | Not yet wired (Mailtrap planned) | Real mode raises `NotImplementedError` |
+| ATS update | `_mock_update_ats()` prints record ID | Not yet wired | Real mode raises `NotImplementedError` |
+
+---
+
+## Design trade-offs
+
+**Model choice — GPT-4o-mini:** Chosen for cost (< $0.01 per full run) and speed. A larger model would produce better-calibrated scores and richer email drafts but adds latency and cost. For a demo this trade-off is acceptable.
+
+**Retry counts — send_email ×3, update_ats ×2:** Email delivery is more likely to hit transient network failures than an ATS write, so it gets one extra attempt. Both use `retry_on=` scoped to their specific exception type so unrelated errors do not trigger retries.
+
+**Critic attempt cap — MAX_ATTEMPTS=3:** Three rounds balance quality improvement against latency. Round 1 almost always fails (too generic), round 2 almost always passes with a real LLM. Round 3 is a safety net before escalating to human review.
+
+**`InMemorySaver` over Postgres:** Keeps the project self-contained and removes a database dependency. The trade-off is that state is lost on process restart. A Postgres checkpointer would allow true multi-session resume but requires additional infrastructure.
 
 The signal scorer research agent runs a live tool loop (Tavily + GitHub) even in partial-real mode — set `HIREGRAPH_USE_MOCKS=false` with both keys configured to see it call tools against real data.

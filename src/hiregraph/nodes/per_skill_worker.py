@@ -12,16 +12,17 @@ def per_skill_worker(state: HireGraphState) -> dict:
     llm = get_llm()
     response = llm.invoke(build_skill_score_prompt(state, skill_name))
 
+    lines = str(response.content).strip().splitlines()
     try:
-        score = int(str(response.content).strip().split()[0])
-        score = max(0, min(100, score))
+        score = max(0, min(100, int(lines[0].strip())))
     except (ValueError, IndexError):
         score = 50
+    evidence = lines[1].strip() if len(lines) > 1 else f"Score: {score}/100"
 
     skill_score = SkillScore(
         skill=skill_name,
         score=score,
-        evidence=f"Assessed from resume. Score: {score}/100.",
+        evidence=evidence,
     )
 
     return {

@@ -1,5 +1,4 @@
-"""HireGraph demo -- three candidate scenarios."""
-from __future__ import annotations
+﻿"""HireGraph demo -- three candidate scenarios."""
 import os, sys
 from pathlib import Path
 

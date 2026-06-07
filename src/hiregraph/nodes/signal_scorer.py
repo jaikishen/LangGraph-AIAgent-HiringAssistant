@@ -1,5 +1,4 @@
-from __future__ import annotations
-from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
+﻿from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 
 from hiregraph.state import HireGraphState
 from hiregraph.llm import get_llm

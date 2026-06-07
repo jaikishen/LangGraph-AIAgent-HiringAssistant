@@ -1,5 +1,4 @@
-from __future__ import annotations
-from hiregraph.state import HireGraphState
+﻿from hiregraph.state import HireGraphState
 
 
 def finalize(state: HireGraphState) -> dict:

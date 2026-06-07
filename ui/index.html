@@ -45,11 +45,11 @@
     .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #a78bfa; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 0.5rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Tab toggle styles */
-    .tab-group { display: flex; gap: 0.4rem; margin-top: 0.8rem; margin-bottom: 0.6rem; }
-    .tab { background: #0f0f1a; color: #94a3b8; border: 1px solid #2d2d45; border-radius: 6px; padding: 0.3rem 0.9rem; font-size: 0.78rem; cursor: pointer; margin-top: 0; }
-    .tab:hover { background: #1a1a2e; color: #e2e8f0; }
-    .tab.active { background: #2d2d45; color: #a78bfa; border-color: #7a6ef5; }
+    /* Radio toggle styles */
+    .radio-group { display: flex; gap: 1.2rem; margin-top: 0.8rem; margin-bottom: 0.6rem; }
+    .radio-group label { display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; color: #94a3b8; cursor: pointer; margin: 0; }
+    .radio-group label:has(input:checked) { color: #a78bfa; }
+    .radio-group input[type="radio"] { accent-color: #7a6ef5; width: 14px; height: 14px; cursor: pointer; }
 
     /* File drop zone */
     .file-zone { border: 1.5px dashed #2d2d45; border-radius: 6px; padding: 1.2rem; text-align: center; cursor: pointer; transition: border-color 0.2s; }
@@ -63,7 +63,7 @@
 <header>
   <div>
     <h1>HireGraph</h1>
-    <p>AI Hiring Assistant &mdash; LangGraph + GPT-4o-mini</p>
+    <p>Smart AI Hiring Assistant</p>
   </div>
 </header>
 <main>
@@ -73,13 +73,13 @@
     <h2>Evaluate Candidate</h2>
 
     <label for="candidate_id">Candidate ID</label>
-    <input type="text" id="candidate_id" placeholder="e.g. priya_001" value="priya_001">
+    <input type="text" id="candidate_id" placeholder="auto-filled from resume filename">
 
     <!-- Resume input -->
     <label>Resume</label>
-    <div class="tab-group">
-      <button class="tab active" onclick="switchTab('resume','file',this)">Upload File</button>
-      <button class="tab" onclick="switchTab('resume','text',this)">Paste Text</button>
+    <div class="radio-group">
+      <label><input type="radio" name="resume-mode" value="file" checked onchange="switchTab('resume','file')"> Upload File</label>
+      <label><input type="radio" name="resume-mode" value="text" onchange="switchTab('resume','text')"> Paste Text</label>
     </div>
     <div id="resume-file-panel">
       <div class="file-zone" onclick="document.getElementById('resume_file').click()"
@@ -98,9 +98,9 @@
 
     <!-- JD input -->
     <label>Job Description</label>
-    <div class="tab-group">
-      <button class="tab active" onclick="switchTab('jd','file',this)">Upload File</button>
-      <button class="tab" onclick="switchTab('jd','text',this)">Paste Text</button>
+    <div class="radio-group">
+      <label><input type="radio" name="jd-mode" value="file" checked onchange="switchTab('jd','file')"> Upload File</label>
+      <label><input type="radio" name="jd-mode" value="text" onchange="switchTab('jd','text')"> Paste Text</label>
     </div>
     <div id="jd-file-panel">
       <div class="file-zone" onclick="document.getElementById('jd_file').click()"
@@ -163,6 +163,21 @@
     <pre id="audit-trail"></pre>
   </section>
 
+  <!-- Graph visualisation -->
+  <section>
+    <h2>Graph — Full Architecture</h2>
+    <p style="font-size:0.78rem;color:#94a3b8;margin-bottom:0.8rem;">Hand-annotated: shows all routing edges, patterns, and color-coded bands.</p>
+    <img src="/graph/cust_graph.png" alt="HireGraph full architecture"
+         style="max-width:100%; border-radius:6px; border:1px solid #2d2d45;">
+  </section>
+
+  <section>
+    <h2>Graph — LangGraph Auto-generated</h2>
+    <p style="font-size:0.78rem;color:#94a3b8;margin-bottom:0.8rem;">Compiled by LangGraph: only shows static <code>add_edge()</code> connections. Dynamic <code>Command(goto=...)</code> routing is not visible to the static analyzer.</p>
+    <img src="/graph/graph.png" alt="LangGraph auto-generated graph"
+         style="max-width:100%; border-radius:6px; border:1px solid #2d2d45;">
+  </section>
+
 </main>
 
 <script>
@@ -171,19 +186,23 @@ let currentThreadId = null;
 // Track which mode (file/text) is active for each field
 const modes = { resume: 'file', jd: 'file' };
 
-function switchTab(field, mode, btn) {
+function switchTab(field, mode) {
   modes[field] = mode;
-  // update tab styles
-  btn.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  // show/hide panels
   document.getElementById(`${field}-file-panel`).style.display = mode === 'file' ? '' : 'none';
   document.getElementById(`${field}-text-panel`).style.display = mode === 'text' ? '' : 'none';
 }
 
 function showFileName(field, input) {
-  const name = input.files[0] ? input.files[0].name : '';
+  const file = input.files[0];
+  const name = file ? file.name : '';
   document.getElementById(`${field}-file-name`).textContent = name;
+  if (field === 'resume' && file) {
+    const stem = file.name.replace(/\.[^.]+$/, '');
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const ts = `${pad(now.getDate())}${pad(now.getMonth()+1)}${now.getFullYear()}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    document.getElementById('candidate_id').value = `${stem}_${ts}`;
+  }
 }
 
 function handleDrop(event, field) {

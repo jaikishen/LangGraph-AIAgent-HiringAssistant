@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Literal
+﻿from typing import Literal
 from langgraph.types import Command, Send
 from pydantic import BaseModel
 
@@ -18,7 +17,7 @@ def plan_required_skills(state: HireGraphState) -> Command:
     plan: SkillPlan = structured.invoke(build_skill_plan_prompt(state))
     skills = plan.skills or []
 
-    audit = [f"plan: extracted {len(skills)} skills — {[s.name for s in skills]}"]
+    audit = [f"plan: extracted {len(skills)} skills â€” {[s.name for s in skills]}"]
 
     if not skills:
         return Command(

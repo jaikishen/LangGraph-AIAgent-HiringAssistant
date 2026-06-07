@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Literal
+﻿from typing import Literal
 from langgraph.types import Command
 
 from hiregraph.state import HireGraphState
@@ -12,7 +11,7 @@ def send_email(state: HireGraphState) -> Command[Literal["update_ats", "compensa
     draft = state.get("email_draft") or "(no draft)"
 
     subject = (
-        "Your Application — Next Steps"
+        "Your Application â€” Next Steps"
         if recommendation == "advance"
         else "Thank you for applying"
     )
@@ -33,7 +32,7 @@ def send_email(state: HireGraphState) -> Command[Literal["update_ats", "compensa
         return Command(
             update={
                 "sent_status": "failed",
-                "audit_trail": [f"send_email: FAILED — {exc}"],
+                "audit_trail": [f"send_email: FAILED â€” {exc}"],
             },
             goto="compensate",
         )

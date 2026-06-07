@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Literal
+﻿from typing import Literal
 from langgraph.types import Command
 
 from hiregraph.state import HireGraphState, Classification

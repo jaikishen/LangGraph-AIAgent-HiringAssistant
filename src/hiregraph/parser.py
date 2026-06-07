@@ -1,5 +1,4 @@
-from __future__ import annotations
-import io
+﻿import io
 
 
 def extract_text(file_bytes: bytes, filename: str) -> str:

@@ -1,5 +1,4 @@
-from __future__ import annotations
-from langchain_core.tools import tool
+﻿from langchain_core.tools import tool
 from hiregraph.services import tavily_search as svc_tavily, github_profile as svc_github
 
 

@@ -1,4 +1,3 @@
-from __future__ import annotations
 from hiregraph.state import HireGraphState
 
 
@@ -25,7 +24,9 @@ def build_skill_score_prompt(state: HireGraphState, skill_name: str) -> str:
     return (
         f"Score the candidate's proficiency in '{skill_name}' from 0 to 100.\n\n"
         f"Resume:\n{state['resume_text']}\n\n"
-        "Return a score (int 0-100) and a one-sentence evidence string."
+        "Reply with exactly two lines:\n"
+        "Line 1: a single integer from 0 to 100 (nothing else)\n"
+        "Line 2: one sentence of evidence from the resume"
     )
 
 
@@ -43,7 +44,7 @@ def build_education_prompt(state: HireGraphState) -> str:
         "Score the candidate's educational background from 0 to 100.\n\n"
         f"Resume:\n{state['resume_text']}\n\n"
         "Return a single integer score from 0 to 100. "
-        "No degree is not a penalty — relevant bootcamps and self-study count."
+        "No degree is not a penalty - relevant bootcamps and self-study count."
     )
 
 

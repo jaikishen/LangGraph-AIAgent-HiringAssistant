@@ -1,4 +1,3 @@
-from __future__ import annotations
 import time
 import uuid
 from hiregraph.config import get_settings
@@ -11,10 +10,6 @@ class EmailSendError(Exception):
 class ATSUpdateError(Exception):
     """Raised when the ATS update fails. Triggers RetryPolicy."""
 
-
-# ---------------------------------------------------------------------------
-# Web search (Tavily)
-# ---------------------------------------------------------------------------
 
 def _mock_tavily_search(query: str) -> list[dict]:
     q = query.lower()
@@ -37,10 +32,6 @@ def tavily_search(query: str) -> list[dict]:
         return _mock_tavily_search(query)
     return _real_tavily_search(query)
 
-
-# ---------------------------------------------------------------------------
-# GitHub profile
-# ---------------------------------------------------------------------------
 
 def _mock_github_profile(username: str) -> dict:
     profiles = {
@@ -74,10 +65,6 @@ def github_profile(username: str) -> dict:
     return _real_github_profile(username)
 
 
-# ---------------------------------------------------------------------------
-# Email send (mock only — real via Mailtrap in bonus phase)
-# ---------------------------------------------------------------------------
-
 def _mock_send_email(to: str, subject: str, body: str) -> None:
     time.sleep(0.01)
     print(f"[mock-email] to={to!r} subject={subject!r}\n{body[:120]}...\n")
@@ -86,12 +73,8 @@ def _mock_send_email(to: str, subject: str, body: str) -> None:
 def send_email(to: str, subject: str, body: str) -> None:
     if get_settings().use_mocks:
         return _mock_send_email(to, subject, body)
-    raise NotImplementedError("Real email send not configured — set HIREGRAPH_USE_MOCKS=true or configure Mailtrap")
+    raise EmailSendError("Real email send not configured - set HIREGRAPH_USE_MOCKS=true or configure Mailtrap")
 
-
-# ---------------------------------------------------------------------------
-# ATS update (mock only)
-# ---------------------------------------------------------------------------
 
 def _mock_update_ats(candidate_id: str, recommendation: str) -> str:
     record_id = f"ATS-{uuid.uuid4().hex[:6].upper()}"
@@ -102,4 +85,4 @@ def _mock_update_ats(candidate_id: str, recommendation: str) -> str:
 def update_ats(candidate_id: str, recommendation: str) -> str:
     if get_settings().use_mocks:
         return _mock_update_ats(candidate_id, recommendation)
-    raise NotImplementedError("Real ATS not configured — set HIREGRAPH_USE_MOCKS=true")
+    raise ATSUpdateError("Real ATS not configured - set HIREGRAPH_USE_MOCKS=true")

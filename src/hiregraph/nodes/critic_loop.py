@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Literal
+﻿from typing import Literal
 from pydantic import ValidationError
 from langgraph.types import Command
 
@@ -21,11 +20,11 @@ def critic_loop(state: HireGraphState) -> Command[Literal["draft_email", "human_
     except (ValidationError, Exception) as exc:
         if attempts >= MAX_ATTEMPTS:
             return Command(
-                update={"audit_trail": [f"critic_loop: parse error on attempt {attempts}, escalating — {exc}"]},
+                update={"audit_trail": [f"critic_loop: parse error on attempt {attempts}, escalating â€” {exc}"]},
                 goto="human_review",
             )
         return Command(
-            update={"audit_trail": [f"critic_loop: parse error on attempt {attempts}, retrying — {exc}"]},
+            update={"audit_trail": [f"critic_loop: parse error on attempt {attempts}, retrying â€” {exc}"]},
             goto="draft_email",
         )
 

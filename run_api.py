@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from dotenv import load_dotenv
-load_dotenv()  # reads .env — HIREGRAPH_USE_MOCKS and other keys apply directly
+load_dotenv(override=True)  # .env is authoritative - overrides any shell env vars
 
 import uvicorn
 

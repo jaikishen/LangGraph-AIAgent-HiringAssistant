@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Literal
+﻿from typing import Literal
 from langgraph.types import Command
 
 from hiregraph.state import HireGraphState
@@ -20,7 +19,7 @@ def update_ats(state: HireGraphState) -> Command[Literal["finalize", "compensate
         return Command(
             update={
                 "sent_status": "compensated",
-                "audit_trail": [f"update_ats: FAILED — {exc}"],
+                "audit_trail": [f"update_ats: FAILED â€” {exc}"],
             },
             goto="compensate",
         )

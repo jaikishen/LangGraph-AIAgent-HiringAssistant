@@ -1,5 +1,4 @@
-from __future__ import annotations
-import operator
+﻿import operator
 from typing import TypedDict, Annotated, Literal
 from pydantic import BaseModel, Field
 
@@ -39,7 +38,7 @@ class HireGraphState(TypedDict):
     # Orchestrator plan
     required_skills:   list[Skill] | None
 
-    # Skill workers — reducer merges parallel writes
+    # Skill workers â€” reducer merges parallel writes
     skill_scores:      Annotated[list[SkillScore], operator.add]
 
     # Fixed parallel scorers
@@ -62,5 +61,5 @@ class HireGraphState(TypedDict):
     # Saga
     sent_status:       Literal["sent", "failed", "compensated", "pending"] | None
 
-    # Audit — every node appends one line
+    # Audit â€” every node appends one line
     audit_trail:       Annotated[list[str], operator.add]

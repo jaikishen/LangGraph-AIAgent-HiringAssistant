@@ -1,5 +1,4 @@
-from __future__ import annotations
-from typing import Literal
+﻿from typing import Literal
 from langgraph.types import Command, interrupt
 
 from hiregraph.state import HireGraphState
@@ -28,6 +27,6 @@ def human_review(state: HireGraphState) -> Command[Literal["send_email", "draft_
         )
 
     return Command(
-        update={"audit_trail": ["human_review: human rejected draft — redrafting"]},
+        update={"audit_trail": ["human_review: human rejected draft â€” redrafting"]},
         goto="draft_email",
     )

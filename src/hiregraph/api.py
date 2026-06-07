@@ -1,5 +1,4 @@
-"""FastAPI server for HireGraph."""
-from __future__ import annotations
+﻿"""FastAPI server for HireGraph."""
 import os, uuid
 from pathlib import Path
 from typing import Any
@@ -32,6 +31,10 @@ app = FastAPI(title="HireGraph API", version="1.0")
 STATIC_DIR = Path(__file__).parent.parent.parent / "ui"
 STATIC_DIR.mkdir(exist_ok=True)
 app.mount("/ui", StaticFiles(directory=str(STATIC_DIR)), name="ui")
+
+GRAPH_DIR = Path(__file__).parent.parent.parent / "graph_out"
+GRAPH_DIR.mkdir(exist_ok=True)
+app.mount("/graph", StaticFiles(directory=str(GRAPH_DIR)), name="graph")
 
 @app.get("/")
 def index():
