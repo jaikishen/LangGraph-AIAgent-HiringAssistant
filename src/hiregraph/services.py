@@ -95,7 +95,7 @@ def send_email(to: str, subject: str, body: str) -> None:
 
 def _mock_update_ats(candidate_id: str, recommendation: str) -> str:
     record_id = f"ATS-{uuid.uuid4().hex[:6].upper()}"
-    print(f"[mock-ats] logged {candidate_id} → {recommendation} as {record_id}")
+    print(f"[mock-ats] logged {candidate_id} -> {recommendation} as {record_id}")
     return record_id
 
 

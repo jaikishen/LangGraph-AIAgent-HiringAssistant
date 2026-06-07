@@ -2,6 +2,7 @@ from __future__ import annotations
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+from langgraph.types import RetryPolicy
 
 from hiregraph.state import HireGraphState
 from hiregraph.nodes import (
@@ -30,8 +31,8 @@ def build_graph() -> StateGraph:
     workflow.add_node("draft_email", draft_email)
     workflow.add_node("critic_loop", critic_loop)
     workflow.add_node("human_review", human_review)
-    workflow.add_node("send_email", send_email)
-    workflow.add_node("update_ats", update_ats)
+    workflow.add_node("send_email", send_email, retry=RetryPolicy(max_attempts=3))
+    workflow.add_node("update_ats", update_ats, retry=RetryPolicy(max_attempts=2))
     workflow.add_node("compensate", compensate)
     workflow.add_node("finalize", finalize)
 
@@ -51,7 +52,7 @@ def build_graph() -> StateGraph:
     workflow.add_edge("signal_scorer", "aggregate_scores")
 
     # Band 5 static edges
-    workflow.add_edge("draft_email", "critic_loop")
+    # NOTE: draft_email uses Command(goto="critic_loop") — no static edge needed
     workflow.add_edge("finalize", END)
 
     return workflow

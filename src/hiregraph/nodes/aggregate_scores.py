@@ -35,7 +35,7 @@ def aggregate_scores(state: HireGraphState) -> Command[Literal["advance_path", "
             "recommendation": recommendation,
             "audit_trail": [
                 f"aggregate: skill_avg={skill_avg:.0f}, exp={exp}, edu={edu}, sig={sig} "
-                f"→ final={final_score}, recommendation={recommendation}"
+                f"-> final={final_score}, recommendation={recommendation}"
             ],
         },
         goto=goto,

@@ -1,0 +1,75 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD
+    START(["▶ START"])
+    END_(["⏹ END"])
+
+    ingest["ingest\n📄 parse resume + JD"]
+    classify["classify_seniority\n🏷 seniority · role family"]
+    plan["plan_required_skills\n🗺 SkillPlan via structured LLM"]
+
+    per_skill["per_skill_worker\n🔧 score one skill"]
+
+    exp["experience_scorer\n📅 years experience → 0-100"]
+    edu["education_scorer\n🎓 education → 0-100"]
+    sig["signal_scorer\n🔍 research agent\nTavily + GitHub tools"]
+
+    agg["aggregate_scores\n📊 final_score formula\n0.40·skill + 0.30·exp\n+ 0.15·edu + 0.15·sig"]
+
+    adv["advance_path\n✅ rec = advance"]
+    rej["reject_path\n❌ rec = reject"]
+    bl["borderline_review\n⏸ interrupt — human scores review"]
+
+    draft["draft_email\n✉ LLM writes email draft"]
+    critic["critic_loop\n🔁 CriticFeedback structured LLM\nmax 3 attempts"]
+    hr["human_review\n⏸ interrupt — human reviews draft\nafter critic exhaustion"]
+
+    send["send_email\n📨 saga step 1\nRetryPolicy × 3"]
+    ats["update_ats\n🗄 saga step 2\nRetryPolicy × 2"]
+    comp["compensate\n↩ rollback on saga failure"]
+    fin["finalize\n🏁 summary audit line"]
+
+    START --> ingest --> classify --> plan
+    plan -. "Send × N skills" .-> per_skill
+
+    per_skill --> exp
+    per_skill --> edu
+    per_skill --> sig
+
+    exp --> agg
+    edu --> agg
+    sig --> agg
+
+    agg -- "score ≥ 75" --> adv
+    agg -- "score < 50" --> rej
+    agg -- "50-74 borderline" --> bl
+
+    adv --> draft
+    rej --> draft
+    bl -- "human decision\napprove / reject" --> draft
+
+    draft --> critic
+    critic -- "approved or score ≥ 70" --> send
+    critic -- "rejected + attempts < 3" --> draft
+    critic -- "attempts = 3 exhausted" --> hr
+    hr -- "human approves" --> send
+    hr -- "human rejects" --> draft
+
+    send -- "success" --> ats
+    send -- "EmailSendError" --> comp
+    ats -- "success" --> fin
+    ats -- "ATSUpdateError" --> comp
+    comp --> fin
+    fin --> END_
+
+    classDef interrupt fill:#fff3cd,stroke:#f0ad4e,color:#333
+    classDef saga fill:#d1ecf1,stroke:#17a2b8,color:#333
+    classDef terminal fill:#d4edda,stroke:#28a745,color:#333
+    classDef default fill:#f2f0ff,stroke:#7a6ef5,color:#333
+
+    class bl,hr interrupt
+    class send,ats,comp saga
+    class fin,END_ terminal
