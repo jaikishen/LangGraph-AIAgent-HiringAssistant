@@ -25,7 +25,7 @@ graph TD;
 	finalize(finalize)
 	__end__(<p>__end__</p>)
 	__start__ --> ingest;
-	classify_seniority --> plan_required_skills;
+	classify_seniority -.-> plan_required_skills;
 	ingest --> classify_seniority;
 	plan_required_skills --> __end__;
 	classDef default fill:#f2f0ff,line-height:1.2

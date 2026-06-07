@@ -28,5 +28,13 @@ def plan_required_skills(state: HireGraphState) -> Command:
 
     return Command(
         update={"required_skills": skills, "audit_trail": audit},
-        goto=[Send("per_skill_worker", {"skill": skill}) for skill in skills],
+        goto=[
+            Send("per_skill_worker", {
+                "skill": skill,
+                "resume_text": state["resume_text"],
+                "jd_text": state["jd_text"],
+                "candidate_id": state["candidate_id"],
+            })
+            for skill in skills
+        ],
     )
