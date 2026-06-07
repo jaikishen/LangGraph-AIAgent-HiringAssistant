@@ -14,8 +14,8 @@
     section { background: #1e1e30; border: 1px solid #2d2d45; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
     h2 { font-size: 1rem; font-weight: 600; color: #a78bfa; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
     label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.3rem; margin-top: 0.8rem; }
-    input, textarea { width: 100%; background: #0f0f1a; border: 1px solid #2d2d45; border-radius: 6px; color: #e2e8f0; padding: 0.6rem 0.8rem; font-size: 0.9rem; font-family: inherit; }
-    input:focus, textarea:focus { outline: none; border-color: #7a6ef5; }
+    input[type="text"], textarea { width: 100%; background: #0f0f1a; border: 1px solid #2d2d45; border-radius: 6px; color: #e2e8f0; padding: 0.6rem 0.8rem; font-size: 0.9rem; font-family: inherit; }
+    input[type="text"]:focus, textarea:focus { outline: none; border-color: #7a6ef5; }
     textarea { resize: vertical; min-height: 140px; }
     button { background: #7a6ef5; color: white; border: none; border-radius: 6px; padding: 0.65rem 1.4rem; font-size: 0.9rem; cursor: pointer; margin-top: 1rem; }
     button:hover { background: #6d5ee0; }
@@ -44,6 +44,19 @@
     pre { background: #0f0f1a; border: 1px solid #2d2d45; border-radius: 6px; padding: 1rem; font-size: 0.78rem; white-space: pre-wrap; word-break: break-word; color: #94a3b8; max-height: 200px; overflow-y: auto; }
     .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #a78bfa; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 0.5rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Tab toggle styles */
+    .tab-group { display: flex; gap: 0.4rem; margin-top: 0.8rem; margin-bottom: 0.6rem; }
+    .tab { background: #0f0f1a; color: #94a3b8; border: 1px solid #2d2d45; border-radius: 6px; padding: 0.3rem 0.9rem; font-size: 0.78rem; cursor: pointer; margin-top: 0; }
+    .tab:hover { background: #1a1a2e; color: #e2e8f0; }
+    .tab.active { background: #2d2d45; color: #a78bfa; border-color: #7a6ef5; }
+
+    /* File drop zone */
+    .file-zone { border: 1.5px dashed #2d2d45; border-radius: 6px; padding: 1.2rem; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+    .file-zone:hover, .file-zone.drag { border-color: #7a6ef5; background: #1a1a2e; }
+    .file-zone input[type="file"] { display: none; }
+    .file-zone .hint { font-size: 0.75rem; color: #94a3b8; margin-top: 0.4rem; }
+    .file-name { font-size: 0.82rem; color: #a78bfa; margin-top: 0.4rem; font-weight: 500; }
   </style>
 </head>
 <body>
@@ -58,16 +71,53 @@
   <!-- Input form -->
   <section id="form-section">
     <h2>Evaluate Candidate</h2>
+
     <label for="candidate_id">Candidate ID</label>
-    <input id="candidate_id" placeholder="e.g. priya_001" value="priya_001">
+    <input type="text" id="candidate_id" placeholder="e.g. priya_001" value="priya_001">
 
-    <label for="resume_text">Resume Text</label>
-    <textarea id="resume_text" rows="6" placeholder="Paste resume here..."></textarea>
+    <!-- Resume input -->
+    <label>Resume</label>
+    <div class="tab-group">
+      <button class="tab active" onclick="switchTab('resume','file',this)">Upload File</button>
+      <button class="tab" onclick="switchTab('resume','text',this)">Paste Text</button>
+    </div>
+    <div id="resume-file-panel">
+      <div class="file-zone" onclick="document.getElementById('resume_file').click()"
+           ondragover="event.preventDefault();this.classList.add('drag')"
+           ondragleave="this.classList.remove('drag')"
+           ondrop="handleDrop(event,'resume')">
+        <input type="file" id="resume_file" accept=".pdf,.docx,.txt,.md" onchange="showFileName('resume',this)">
+        <div>Click to browse or drag &amp; drop</div>
+        <div class="hint">PDF, DOCX, TXT, or MD</div>
+        <div class="file-name" id="resume-file-name"></div>
+      </div>
+    </div>
+    <div id="resume-text-panel" style="display:none">
+      <textarea id="resume_text" rows="6" placeholder="Paste resume text here..."></textarea>
+    </div>
 
-    <label for="jd_text">Job Description</label>
-    <textarea id="jd_text" rows="5" placeholder="Paste job description here..."></textarea>
+    <!-- JD input -->
+    <label>Job Description</label>
+    <div class="tab-group">
+      <button class="tab active" onclick="switchTab('jd','file',this)">Upload File</button>
+      <button class="tab" onclick="switchTab('jd','text',this)">Paste Text</button>
+    </div>
+    <div id="jd-file-panel">
+      <div class="file-zone" onclick="document.getElementById('jd_file').click()"
+           ondragover="event.preventDefault();this.classList.add('drag')"
+           ondragleave="this.classList.remove('drag')"
+           ondrop="handleDrop(event,'jd')">
+        <input type="file" id="jd_file" accept=".pdf,.docx,.txt,.md" onchange="showFileName('jd',this)">
+        <div>Click to browse or drag &amp; drop</div>
+        <div class="hint">PDF, DOCX, TXT, or MD</div>
+        <div class="file-name" id="jd-file-name"></div>
+      </div>
+    </div>
+    <div id="jd-text-panel" style="display:none">
+      <textarea id="jd_text" rows="5" placeholder="Paste job description here..."></textarea>
+    </div>
 
-    <button id="submit-btn" onclick="evaluate()">Evaluate</button>
+    <button id="submit-btn" onclick="runEvaluation()">Evaluate</button>
     <div id="status-bar"></div>
   </section>
 
@@ -76,19 +126,35 @@
     <h2>Human Review Required</h2>
     <p id="interrupt-msg" style="color:#fcd34d; margin-bottom:1rem; font-size:0.9rem;"></p>
     <div id="interrupt-detail" style="margin-bottom:1rem;"></div>
-    <button class="success" onclick="resume(true)">Approve</button>
-    <button class="danger"  onclick="resume(false)" style="margin-left:0.5rem;">Reject</button>
+    <button class="success" onclick="doResume(true)">Approve</button>
+    <button class="danger"  onclick="doResume(false)" style="margin-left:0.5rem;">Reject</button>
   </section>
 
   <!-- Results -->
   <section id="results">
     <h2>Evaluation Results</h2>
+
+    <div id="classification-bar" style="display:none; padding:0.5rem 0.8rem; background:#0f0f1a; border:1px solid #2d2d45; border-radius:6px; margin-bottom:1rem; font-size:0.9rem; color:#94a3b8; letter-spacing:0.02em;"></div>
+
     <div class="scoreboard" id="scoreboard"></div>
 
     <table id="skill-table" style="margin-bottom:1rem;">
-      <thead><tr><th>Skill</th><th>Score</th><th>Bar</th></tr></thead>
+      <thead><tr><th>Skill</th><th>Score</th><th>Bar</th><th>Evidence</th></tr></thead>
       <tbody></tbody>
     </table>
+
+    <div id="required-skills-wrap" style="display:none; margin-bottom:1rem;">
+      <h2 style="margin-bottom:0.5rem;">Required Skills</h2>
+      <table id="required-skills-table">
+        <thead><tr><th>Skill</th><th>Required Years</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="critic-history-wrap" style="display:none; margin-bottom:1rem;">
+      <h2 style="margin-bottom:0.5rem;">Critic Rounds</h2>
+      <div id="critic-history"></div>
+    </div>
 
     <h2 style="margin-bottom:0.5rem;">Email Draft</h2>
     <pre id="email-draft"></pre>
@@ -102,52 +168,101 @@
 <script>
 let currentThreadId = null;
 
-function status(msg, type = "info") {
+// Track which mode (file/text) is active for each field
+const modes = { resume: 'file', jd: 'file' };
+
+function switchTab(field, mode, btn) {
+  modes[field] = mode;
+  // update tab styles
+  btn.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  // show/hide panels
+  document.getElementById(`${field}-file-panel`).style.display = mode === 'file' ? '' : 'none';
+  document.getElementById(`${field}-text-panel`).style.display = mode === 'text' ? '' : 'none';
+}
+
+function showFileName(field, input) {
+  const name = input.files[0] ? input.files[0].name : '';
+  document.getElementById(`${field}-file-name`).textContent = name;
+}
+
+function handleDrop(event, field) {
+  event.preventDefault();
+  event.currentTarget.classList.remove('drag');
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  const input = document.getElementById(`${field}_file`);
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  input.files = dt.files;
+  showFileName(field, input);
+}
+
+function setStatus(msg, type = "info") {
   const bar = document.getElementById("status-bar");
   bar.className = type;
   bar.style.display = "block";
   bar.innerHTML = msg;
 }
 
-async function evaluate() {
+async function runEvaluation() {
+  console.log("[HireGraph] evaluate() called, modes=", JSON.stringify(modes));
   const candidate_id = document.getElementById("candidate_id").value.trim();
-  const resume_text  = document.getElementById("resume_text").value.trim();
-  const jd_text      = document.getElementById("jd_text").value.trim();
+  if (!candidate_id) { setStatus("Please enter a Candidate ID.", "error"); return; }
 
-  if (!candidate_id || !resume_text || !jd_text) {
-    status("Please fill in all fields.", "error"); return;
+  const fd = new FormData();
+  fd.append("candidate_id", candidate_id);
+
+  // Resume
+  if (modes.resume === 'file') {
+    const f = document.getElementById("resume_file").files[0];
+    console.log("[HireGraph] resume file:", f ? f.name : "NONE — no file selected");
+    if (!f) { setStatus("No resume file selected — please click the file zone to pick a file, or switch to Paste Text.", "error"); return; }
+    fd.append("resume_file", f);
+  } else {
+    const t = document.getElementById("resume_text").value.trim();
+    if (!t) { setStatus("Please paste resume text.", "error"); return; }
+    fd.append("resume_text", t);
+  }
+
+  // JD
+  if (modes.jd === 'file') {
+    const f = document.getElementById("jd_file").files[0];
+    console.log("[HireGraph] JD file:", f ? f.name : "NONE — no file selected");
+    if (!f) { setStatus("No JD file selected — please click the file zone to pick a file, or switch to Paste Text.", "error"); return; }
+    fd.append("jd_file", f);
+  } else {
+    const t = document.getElementById("jd_text").value.trim();
+    if (!t) { setStatus("Please paste job description text.", "error"); return; }
+    fd.append("jd_text", t);
   }
 
   document.getElementById("submit-btn").disabled = true;
   document.getElementById("results").style.display = "none";
   document.getElementById("interrupt-box").style.display = "none";
-  status('<span class="spinner"></span>Running evaluation…', "info");
+  setStatus('<span class="spinner"></span>Running evaluation&hellip;', "info");
 
   try {
-    const res = await fetch("/evaluate", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({candidate_id, resume_text, jd_text})
-    });
+    const res = await fetch("/evaluate-file", { method: "POST", body: fd });
     const data = await res.json();
+    if (!res.ok) { setStatus("Error: " + (data.detail || res.statusText), "error"); return; }
     currentThreadId = data.thread_id;
-
     if (data.status === "interrupted") {
       showInterrupt(data.interrupt_data);
     } else {
       showResults(data.result);
-      status("Evaluation complete.", "success");
+      setStatus("Evaluation complete.", "success");
     }
   } catch (e) {
-    status("Error: " + e.message, "error");
+    setStatus("Error: " + e.message, "error");
   } finally {
     document.getElementById("submit-btn").disabled = false;
   }
 }
 
-async function resume(approved) {
+async function doResume(approved) {
   if (!currentThreadId) return;
-  status('<span class="spinner"></span>Resuming…', "info");
+  setStatus('<span class="spinner"></span>Resuming&hellip;', "info");
   document.getElementById("interrupt-box").style.display = "none";
 
   try {
@@ -161,15 +276,14 @@ async function resume(approved) {
       })
     });
     const data = await res.json();
-
     if (data.status === "interrupted") {
       showInterrupt(data.interrupt_data);
     } else {
       showResults(data.result);
-      status("Evaluation complete.", "success");
+      setStatus("Evaluation complete.", "success");
     }
   } catch (e) {
-    status("Error: " + e.message, "error");
+    setStatus("Error: " + e.message, "error");
   }
 }
 
@@ -179,19 +293,61 @@ function showInterrupt(data) {
   document.getElementById("interrupt-msg").textContent = data.action || "Human review required.";
   const detail = document.getElementById("interrupt-detail");
   detail.innerHTML = "";
+
+  // Score summary
   if (data.final_score !== undefined) {
-    detail.innerHTML += `<p style="font-size:0.85rem;color:#94a3b8;">Final score: <strong style="color:#a78bfa">${data.final_score}</strong></p>`;
+    detail.innerHTML += `<p style="font-size:0.9rem;color:#94a3b8;margin-bottom:0.6rem;">
+      Final score: <strong style="color:#a78bfa;font-size:1.1rem;">${data.final_score}</strong>/100
+    </p>`;
   }
+
+  // Skill scores table
+  if (data.skill_scores && data.skill_scores.length) {
+    let rows = data.skill_scores.map(s =>
+      `<tr>
+        <td>${esc(s.skill)}</td>
+        <td>${s.score}/100</td>
+        <td><div class="bar-wrap"><div class="bar" style="width:${s.score}%"></div></div></td>
+       </tr>`
+    ).join("");
+    detail.innerHTML += `
+      <table style="margin-bottom:0.8rem;">
+        <thead><tr><th>Skill</th><th>Score</th><th>Bar</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  // Audit trail
+  if (data.audit_trail && data.audit_trail.length) {
+    detail.innerHTML += `
+      <p style="font-size:0.75rem;color:#94a3b8;margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.05em;">Audit Trail</p>
+      <pre style="max-height:140px;">${esc(data.audit_trail.join("\n"))}</pre>`;
+  }
+
+  // Email draft (for human_review interrupt)
   if (data.email_draft) {
-    detail.innerHTML += `<p style="font-size:0.8rem;color:#94a3b8;margin-top:0.5rem;">Draft:</p><pre style="margin-top:0.3rem;">${esc(data.email_draft.slice(0, 300))}</pre>`;
+    detail.innerHTML += `<p style="font-size:0.75rem;color:#94a3b8;margin-top:0.6rem;margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.05em;">Email Draft</p>
+      <pre style="margin-top:0.3rem;">${esc(data.email_draft.slice(0, 400))}</pre>`;
   }
-  status("Waiting for human decision…", "warn");
+
+  setStatus("Waiting for human decision&hellip;", "warn");
 }
 
 function showResults(r) {
   if (!r) return;
   document.getElementById("results").style.display = "block";
 
+  // Classification banner
+  const clf = r.classification;
+  const clfBar = document.getElementById("classification-bar");
+  if (clf) {
+    clfBar.textContent = `${clf.seniority}  ·  ${clf.role_family}  ·  confidence: ${clf.confidence}`;
+    clfBar.style.display = "block";
+  } else {
+    clfBar.style.display = "none";
+  }
+
+  // Scoreboard — 7 cards
   const rec = r.recommendation || "?";
   const recClass = rec === "advance" ? "advance" : rec === "reject" ? "reject" : "";
   const sb = document.getElementById("scoreboard");
@@ -212,17 +368,62 @@ function showResults(r) {
       <div class="val">${r.draft_attempts ?? 0}</div>
       <div class="lbl">Critic Rounds</div>
     </div>
+    <div class="card">
+      <div class="val">${r.experience_score ?? "—"}</div>
+      <div class="lbl">Experience</div>
+    </div>
+    <div class="card">
+      <div class="val">${r.education_score ?? "—"}</div>
+      <div class="lbl">Education</div>
+    </div>
+    <div class="card">
+      <div class="val">${r.signal_score ?? "—"}</div>
+      <div class="lbl">Signal</div>
+    </div>
   `;
 
+  // Skill scores with evidence
   const tbody = document.querySelector("#skill-table tbody");
   tbody.innerHTML = "";
   (r.skill_scores || []).forEach(s => {
+    const ev = s.evidence || "";
+    const evShort = ev.length > 80 ? ev.slice(0, 80) + "…" : ev;
     tbody.innerHTML += `<tr>
       <td>${esc(s.skill)}</td>
       <td>${s.score}/100</td>
       <td><div class="bar-wrap"><div class="bar" style="width:${s.score}%"></div></div></td>
+      <td title="${esc(ev)}" style="color:#94a3b8;font-size:0.78rem;">${esc(evShort)}</td>
     </tr>`;
   });
+
+  // Required skills
+  const rsWrap = document.getElementById("required-skills-wrap");
+  const rsList = r.required_skills || [];
+  if (rsList.length) {
+    document.querySelector("#required-skills-table tbody").innerHTML =
+      rsList.map(s => `<tr><td>${esc(s.name)}</td><td>${s.required_years ?? "—"}</td></tr>`).join("");
+    rsWrap.style.display = "block";
+  } else {
+    rsWrap.style.display = "none";
+  }
+
+  // Critic history
+  const chWrap = document.getElementById("critic-history-wrap");
+  const ch = r.critic_history || [];
+  if (ch.length) {
+    document.getElementById("critic-history").innerHTML = ch.map((f, i) => {
+      const icon = f.approved ? "✅" : "❌";
+      return `<div style="margin-bottom:0.8rem;">
+        <div style="font-size:0.85rem;color:#e2e8f0;margin-bottom:0.3rem;">
+          Round ${i + 1} &mdash; score: <strong>${f.score}</strong> &mdash; ${icon} ${f.approved ? "Approved" : "Not approved"}
+        </div>
+        <pre style="max-height:100px;">${esc(f.feedback)}</pre>
+      </div>`;
+    }).join("");
+    chWrap.style.display = "block";
+  } else {
+    chWrap.style.display = "none";
+  }
 
   document.getElementById("email-draft").textContent = r.email_draft || "(none)";
   document.getElementById("audit-trail").textContent = (r.audit_trail || []).join("\n");

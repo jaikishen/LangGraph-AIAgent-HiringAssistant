@@ -14,6 +14,7 @@ def borderline_review(state: HireGraphState) -> Command[Literal["draft_email"]]:
             {"skill": s.skill, "score": s.score, "evidence": s.evidence}
             for s in (state.get("skill_scores") or [])
         ],
+        "audit_trail": state.get("audit_trail") or [],
         "action": "Review candidate scorecard. Approve to advance, reject to send rejection email.",
     })
 

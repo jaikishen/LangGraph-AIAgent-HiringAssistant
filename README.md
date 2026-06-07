@@ -109,11 +109,11 @@ hiregraph/
 │   └── graph.png             # Rendered graph image
 ├── run_test_band1.py         # Band 1: ingest → classify → plan
 ├── run_test_band2.py         # Band 2: per_skill_worker (operator.add fan-out)
-├── run_test_band3.py         # Band 3: parallel scorers
+├── run_test_band3.py         # Band 3: parallel scorers + sub-scores
 ├── run_test_band4.py         # Band 4: aggregate routing (Priya=advance, Mira=reject)
 ├── run_test_band5.py         # Band 5: borderline interrupt/resume (Eitan)
-├── run_band6.py              # Critic loop (evaluator-optimizer, 2 rounds)
-├── run_band7.py              # Full saga (send_email → update_ats → finalize)
+├── run_test_band6.py         # Band 6: critic loop (evaluator-optimizer, 2 rounds)
+├── run_test_band7.py         # Band 7: full saga (send_email → update_ats → finalize)
 ├── run_signal.py             # Signal scorer in isolation (real APIs)
 ├── run_api.py                # Start FastAPI server
 └── pyproject.toml
@@ -156,14 +156,24 @@ Runs Priya (advance), Mira (reject), and Eitan (borderline + human interrupt/res
 ### Band-by-band scripts (incremental milestones)
 
 ```bash
-uv run python run_test_band1.py   # ingest + classify + plan
-uv run python run_test_band2.py   # skill workers (4 SkillScores via operator.add)
-uv run python run_test_band3.py   # parallel scorers
-uv run python run_test_band4.py   # routing: Priya=advance, Mira=reject
-uv run python run_test_band5.py   # borderline interrupt + resume (Eitan)
-uv run python run_band6.py        # critic loop (2 rounds: rejected → approved)
-uv run python run_band7.py        # full saga: email → ATS → finalize
+uv run python run_test_band1.py
+uv run python run_test_band2.py
+uv run python run_test_band3.py
+uv run python run_test_band4.py
+uv run python run_test_band5.py
+uv run python run_test_band6.py
+uv run python run_test_band7.py
 ```
+
+- **`run_test_band1.py`** — Priya through the linear chain only: prints classification, required skills, and audit trail. Confirms ingest → classify → plan wiring.
+- **`run_test_band2.py`** — Adds the skill worker fan-out: prints every `SkillScore` (skill, score, evidence) produced by the `operator.add` reducer across 4 parallel workers.
+- **`run_test_band3.py`** — Deepest view for Priya: classification + required skills + every skill score with evidence + sub-scores (experience / education / signal) + audit trail.
+- **`run_test_band4.py`** — Side-by-side Priya vs Mira: final score, recommendation, and full audit trail for both in one run. Confirms advance/reject routing.
+- **`run_test_band5.py`** — Eitan: shows the interrupt firing, the scorecard payload, and the resume-with-approval flow.
+- **`run_test_band6.py`** — Critic loop (evaluator-optimizer): prints the email draft, both critic rounds (rejected → approved), and the draft/critic audit lines.
+- **`run_test_band7.py`** — Full saga: `send_email` → `update_ats` → `finalize`. Prints `sent_status`, saga-node audit lines, and the complete audit trail.
+
+Start with **band3** to see the full evaluation detail, then **band4** for the Priya/Mira contrast, then **band5** for Eitan's interrupt.
 
 ### API server
 

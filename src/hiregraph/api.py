@@ -4,13 +4,15 @@ import os, uuid
 from pathlib import Path
 from typing import Any
 
-os.environ.setdefault("HIREGRAPH_USE_MOCKS", "true")
+# os.environ.setdefault("HIREGRAPH_USE_MOCKS", "true")
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Form, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from langgraph.types import Command
+
+from hiregraph.parser import extract_text
 
 from hiregraph.graph import compile_graph
 
@@ -220,6 +222,32 @@ def status(thread_id: str):
         "final_score": result.get("final_score"),
         "sent_status": result.get("sent_status"),
     }
+
+
+@app.post("/evaluate-file")
+async def evaluate_file(
+    candidate_id: str = Form(...),
+    resume_file: UploadFile = File(None),
+    resume_text: str = Form(""),
+    jd_file: UploadFile = File(None),
+    jd_text: str = Form(""),
+):
+    """Start evaluation from uploaded files and/or pasted text."""
+    resume_str = (
+        extract_text(await resume_file.read(), resume_file.filename)
+        if resume_file and resume_file.filename
+        else resume_text
+    )
+    jd_str = (
+        extract_text(await jd_file.read(), jd_file.filename)
+        if jd_file and jd_file.filename
+        else jd_text
+    )
+    if not resume_str.strip() or not jd_str.strip():
+        raise HTTPException(400, "Resume and JD are required (upload a file or paste text)")
+
+    req = EvaluateRequest(candidate_id=candidate_id, resume_text=resume_str, jd_text=jd_str)
+    return evaluate(req)
 
 
 @app.get("/health")
