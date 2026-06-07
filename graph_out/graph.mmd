@@ -1,0 +1,33 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__(<p>__start__</p>)
+	ingest(ingest)
+	classify_seniority(classify_seniority)
+	plan_required_skills(plan_required_skills)
+	per_skill_worker(per_skill_worker)
+	experience_scorer(experience_scorer)
+	education_scorer(education_scorer)
+	signal_scorer(signal_scorer)
+	aggregate_scores(aggregate_scores)
+	advance_path(advance_path)
+	reject_path(reject_path)
+	borderline_review(borderline_review)
+	draft_email(draft_email)
+	critic_loop(critic_loop)
+	human_review(human_review)
+	send_email(send_email)
+	update_ats(update_ats)
+	compensate(compensate)
+	finalize(finalize)
+	__end__(<p>__end__</p>)
+	__start__ --> ingest;
+	classify_seniority --> plan_required_skills;
+	ingest --> classify_seniority;
+	plan_required_skills --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
