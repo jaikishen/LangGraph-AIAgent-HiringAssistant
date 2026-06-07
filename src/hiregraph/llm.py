@@ -79,10 +79,10 @@ class MockLLM:
                 "we are pleased to move forward with your application.\n\n"
                 "Best regards,\nHiring Team"
             ))
+        if "educational background" in text:
+            return _MockResponse(content="70")
         if "experience" in text and "score" in text:
             return _MockResponse(content="82")
-        if "education" in text and "score" in text:
-            return _MockResponse(content="70")
         if "signal" in text or "github" in text:
             return _MockResponse(content="80")
         return _MockResponse(content="75")
